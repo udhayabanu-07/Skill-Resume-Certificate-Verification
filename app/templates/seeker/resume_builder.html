@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Builder & Editor{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Top Action Bar -->
+    <div class="card-custom p-4 mb-4 bg-white">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <a href="{{ url_for('seeker.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </a>
+                    <span class="badge bg-teal" style="background: var(--teal-500);">Interactive CV Editor</span>
+                </div>
+                <h3 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Resume Builder & Management</h3>
+                <small class="text-muted">Create and refine each section of your professional profile</small>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('seeker.resume_preview') }}" class="btn btn-outline-teal">
+                    <i class="bi bi-eye-fill me-1"></i> Preview Resume
+                </a>
+                <a href="{{ url_for('seeker.resume_download_pdf') }}" class="btn btn-navy">
+                    <i class="bi bi-download me-1"></i> Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Form Column: Personal Details & Objective -->
+        <div class="col-lg-7">
+            <!-- SECTION 1 & 2: Personal Details & Career Objective -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Personal Information & Objective</h5>
+                        <small class="text-muted">Contact details and career summary</small>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('seeker.resume_builder') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="first_name" class="form-label form-label-custom">First Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-custom" id="first_name" name="first_name" value="{{ profile.first_name }}" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="last_name" class="form-label form-label-custom">Last Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-custom" id="last_name" name="last_name" value="{{ profile.last_name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="headline" class="form-label form-label-custom">Professional Headline / Title</label>
+                        <input type="text" class="form-control form-control-custom" id="headline" name="headline" value="{{ profile.headline or '' }}" placeholder="e.g. Senior Software Engineer | Cloud Architect">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="phone" class="form-label form-label-custom">Phone Number</label>
+                            <input type="tel" class="form-control form-control-custom" id="phone" name="phone" value="{{ profile.phone or '' }}" placeholder="+1 234 567 8900">
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="city" class="form-label form-label-custom">City</label>
+                            <input type="text" class="form-control form-control-custom" id="city" name="city" value="{{ profile.city or '' }}" placeholder="e.g. New York">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label for="country" class="form-label form-label-custom">Country</label>
+                            <input type="text" class="form-control form-control-custom" id="country" name="country" value="{{ profile.country or '' }}" placeholder="e.g. United States">
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="address" class="form-label form-label-custom">Address / Street</label>
+                            <input type="text" class="form-control form-control-custom" id="address" name="address" value="{{ profile.address or '' }}" placeholder="e.g. 123 Tech Avenue">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-4">
+                            <label for="linkedin_url" class="form-label form-label-custom">LinkedIn URL</label>
+                            <input type="url" class="form-control form-control-custom" id="linkedin_url" name="linkedin_url" value="{{ profile.linkedin_url or '' }}" placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="github_url" class="form-label form-label-custom">GitHub URL</label>
+                            <input type="url" class="form-control form-control-custom" id="github_url" name="github_url" value="{{ profile.github_url or '' }}" placeholder="https://github.com/...">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="portfolio_url" class="form-label form-label-custom">Portfolio URL</label>
+                            <input type="url" class="form-control form-control-custom" id="portfolio_url" name="portfolio_url" value="{{ profile.portfolio_url or '' }}" placeholder="https://myportfolio.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="career_objective" class="form-label form-label-custom">Career Objective / Professional Summary</label>
+                        <textarea class="form-control form-control-custom" id="career_objective" name="career_objective" rows="4" placeholder="Briefly articulate your career goals, strengths, and professional ethos...">{{ profile.effective_objective }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-teal">
+                        <i class="bi bi-save me-1"></i> Save Personal Details & Objective
+                    </button>
+                </form>
+            </div>
+
+            <!-- SECTION: Work Experience -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon navy" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Work Experience</h5>
+                            <small class="text-muted">Career roles and employment history</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-teal" data-bs-toggle="collapse" data-bs-target="#addExperienceCollapse">
+                        <i class="bi bi-plus-lg me-1"></i> Add Experience
+                    </button>
+                </div>
+
+                <!-- Add Experience Form -->
+                <div class="collapse mb-3" id="addExperienceCollapse">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <h6 class="fw-bold mb-3 text-navy-900">Add New Work Experience</h6>
+                        <form method="POST" action="{{ url_for('seeker.add_experience') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-semibold">Company Name <span class="text-danger">*</span></label>
+                                    <input type="text" name="company" class="form-control form-control-sm" placeholder="e.g. Google, Stripe" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-semibold">Job Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="job_title" class="form-control form-control-sm" placeholder="e.g. Lead Software Engineer" required>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-4">
+                                    <label class="form-label small fw-semibold">Location</label>
+                                    <input type="text" name="location" class="form-control form-control-sm" placeholder="e.g. San Francisco, CA">
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label small fw-semibold">Start Date <span class="text-danger">*</span></label>
+                                    <input type="date" name="start_date" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="form-label small fw-semibold">End Date</label>
+                                    <input type="date" name="end_date" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="is_current" class="form-check-input" id="expCurrentCheck" value="true">
+                                <label class="form-check-label small" for="expCurrentCheck">I currently work here</label>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Job Description & Responsibilities</label>
+                                <textarea name="description" class="form-control form-control-sm" rows="3" placeholder="Key achievements, technologies used, leadership responsibilities..."></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-teal">Add Experience</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#addExperienceCollapse">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing Experiences List -->
+                {% if experiences %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for exp in experiences %}
+                            <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <strong class="d-block text-navy-900">{{ exp.job_title }}</strong>
+                                    <span class="text-teal fw-semibold small" style="color: var(--teal-600);">{{ exp.company }}</span>
+                                    {% if exp.location %}
+                                        <small class="text-muted">• {{ exp.location }}</small>
+                                    {% endif %}
+                                    <div class="small text-muted mt-1">
+                                        {{ exp.start_date.strftime('%b %Y') if exp.start_date else '' }} – 
+                                        {{ 'Present' if exp.is_current else (exp.end_date.strftime('%b %Y') if exp.end_date else '') }}
+                                    </div>
+                                    {% if exp.description %}
+                                        <p class="small text-secondary mt-2 mb-0">{{ exp.description }}</p>
+                                    {% endif %}
+                                </div>
+                                <form method="POST" action="{{ url_for('seeker.delete_experience', item_id=exp.id) }}" onsubmit="return confirm('Remove this experience entry?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No work experience entries added yet. Click "Add Experience" to begin.</p>
+                {% endif %}
+            </div>
+
+            <!-- SECTION: Projects -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <i class="bi bi-code-slash"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Projects & Portfolio</h5>
+                            <small class="text-muted">Key technical projects and open-source contributions</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-teal" data-bs-toggle="collapse" data-bs-target="#addProjectCollapse">
+                        <i class="bi bi-plus-lg me-1"></i> Add Project
+                    </button>
+                </div>
+
+                <div class="collapse mb-3" id="addProjectCollapse">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <h6 class="fw-bold mb-3 text-navy-900">Add New Project</h6>
+                        <form method="POST" action="{{ url_for('seeker.add_project') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row g-2 mb-2">
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-semibold">Project Title <span class="text-danger">*</span></label>
+                                    <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. AI Document Verification Engine" required>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label small fw-semibold">Technologies Used</label>
+                                    <input type="text" name="technologies" class="form-control form-control-sm" placeholder="e.g. Python, Flask, PyMySQL, Docker">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Project / GitHub URL</label>
+                                <input type="url" name="project_url" class="form-control form-control-sm" placeholder="https://github.com/username/project">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold">Project Description</label>
+                                <textarea name="description" class="form-control form-control-sm" rows="3" placeholder="Overview of problem solved, architecture, and impact..."></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-teal">Add Project</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#addProjectCollapse">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if projects %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for proj in projects %}
+                            <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <strong class="d-block text-navy-900">{{ proj.title }}</strong>
+                                    {% if proj.technologies %}
+                                        <span class="badge bg-secondary-subtle text-dark small mb-1">{{ proj.technologies }}</span>
+                                    {% endif %}
+                                    {% if proj.project_url %}
+                                        <div class="small">
+                                            <a href="{{ proj.project_url }}" target="_blank" class="text-teal" style="color: var(--teal-600);">
+                                                <i class="bi bi-box-arrow-up-right"></i> {{ proj.project_url }}
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                    {% if proj.description %}
+                                        <p class="small text-secondary mt-2 mb-0">{{ proj.description }}</p>
+                                    {% endif %}
+                                </div>
+                                <form method="POST" action="{{ url_for('seeker.delete_project', item_id=proj.id) }}" onsubmit="return confirm('Remove this project?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No projects added yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Education, Skills, Achievements, Certifications -->
+        <div class="col-lg-5">
+            <!-- SECTION: Education -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon navy" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Education</h5>
+                            <small class="text-muted">Degrees and institutions</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-teal" data-bs-toggle="collapse" data-bs-target="#addEducationCollapse">
+                        <i class="bi bi-plus-lg me-1"></i> Add
+                    </button>
+                </div>
+
+                <div class="collapse mb-3" id="addEducationCollapse">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <h6 class="fw-bold mb-2 text-navy-900">Add Education Entry</h6>
+                        <form method="POST" action="{{ url_for('seeker.add_education') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Institution <span class="text-danger">*</span></label>
+                                <input type="text" name="institution" class="form-control form-control-sm" placeholder="e.g. Stanford University" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Degree <span class="text-danger">*</span></label>
+                                <input type="text" name="degree" class="form-control form-control-sm" placeholder="e.g. Bachelor of Science" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Field of Study</label>
+                                <input type="text" name="field_of_study" class="form-control form-control-sm" placeholder="e.g. Computer Science">
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Start Date</label>
+                                    <input type="date" name="start_date" class="form-control form-control-sm">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">End Date</label>
+                                    <input type="date" name="end_date" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Grade / CGPA</label>
+                                <input type="text" name="grade_or_cgpa" class="form-control form-control-sm" placeholder="e.g. 3.9 / 4.0">
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-teal">Save</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#addEducationCollapse">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if educations %}
+                    <div class="d-flex flex-column gap-2">
+                        {% for edu in educations %}
+                            <div class="p-2 border rounded-2 bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="d-block small text-navy-900">{{ edu.degree }} {% if edu.field_of_study %}- {{ edu.field_of_study }}{% endif %}</strong>
+                                    <small class="text-teal d-block" style="color: var(--teal-600);">{{ edu.institution }}</small>
+                                    <small class="text-muted">
+                                        {{ edu.start_date.strftime('%Y') if edu.start_date else '' }} – {{ edu.end_date.strftime('%Y') if edu.end_date else '' }}
+                                        {% if edu.grade_or_cgpa %}({{ edu.grade_or_cgpa }}){% endif %}
+                                    </small>
+                                </div>
+                                <form method="POST" action="{{ url_for('seeker.delete_education', item_id=edu.id) }}" onsubmit="return confirm('Remove education entry?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No education entries added yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- SECTION: Technical Skills -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <i class="bi bi-tools"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Technical Skills</h5>
+                            <small class="text-muted">Competencies & proficiencies</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-teal" data-bs-toggle="collapse" data-bs-target="#addSkillCollapse">
+                        <i class="bi bi-plus-lg me-1"></i> Add
+                    </button>
+                </div>
+
+                <div class="collapse mb-3" id="addSkillCollapse">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <form method="POST" action="{{ url_for('seeker.add_skill') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Skill Name <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Python, SQL, AWS, React" required>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Category</label>
+                                    <select name="category" class="form-select form-select-sm">
+                                        <option value="technical" selected>Technical Skill</option>
+                                        <option value="soft">Soft Skill / Competency</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Proficiency</label>
+                                    <select name="proficiency_level" class="form-select form-select-sm">
+                                        <option value="beginner">Beginner</option>
+                                        <option value="intermediate" selected>Intermediate</option>
+                                        <option value="advanced">Advanced</option>
+                                        <option value="expert">Expert</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Years Exp.</label>
+                                    <input type="number" step="0.5" name="years_of_experience" class="form-control form-control-sm" placeholder="e.g. 3.5">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small fw-semibold">Link Certificate</label>
+                                    <select name="certificate_id" class="form-select form-select-sm">
+                                        <option value="">None</option>
+                                        {% for c in certificates %}
+                                            <option value="{{ c.id }}">{{ c.title[:22] }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-teal">Add Skill</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#addSkillCollapse">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if skills %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for s in skills %}
+                            <span class="badge border py-2 px-3 text-dark bg-light d-inline-flex align-items-center gap-2">
+                                <strong>{{ s.name }}</strong>
+                                {% if s.category == 'soft' %}
+                                    <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.65rem;">Soft</span>
+                                {% endif %}
+                                <small class="text-muted">({{ s.proficiency_level.capitalize() }})</small>
+                                {% if s.certificate %}
+                                    <i class="bi bi-patch-check-fill text-success" title="Linked to: {{ s.certificate.title }}"></i>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('seeker.delete_skill', item_id=s.id) }}" class="d-inline" onsubmit="return confirm('Remove skill {{ s.name }}?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-link p-0 text-danger border-0" style="line-height: 1;">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    </button>
+                                </form>
+                            </span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No technical skills added yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- SECTION: Achievements -->
+            <div class="card-custom p-4 bg-white mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon navy" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <i class="bi bi-trophy-fill"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Honors & Achievements</h5>
+                            <small class="text-muted">Awards and recognitions</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-teal" data-bs-toggle="collapse" data-bs-target="#addAchievementCollapse">
+                        <i class="bi bi-plus-lg me-1"></i> Add
+                    </button>
+                </div>
+
+                <div class="collapse mb-3" id="addAchievementCollapse">
+                    <div class="p-3 border rounded-3 bg-light">
+                        <form method="POST" action="{{ url_for('seeker.add_achievement') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Achievement Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control form-control-sm" placeholder="e.g. 1st Place National Hackathon" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Date Achieved</label>
+                                <input type="date" name="date_achieved" class="form-control form-control-sm">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small fw-semibold">Description</label>
+                                <textarea name="description" class="form-control form-control-sm" rows="2" placeholder="Brief context on this award..."></textarea>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-teal">Save</button>
+                                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="collapse" data-bs-target="#addAchievementCollapse">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                {% if achievements %}
+                    <div class="d-flex flex-column gap-2">
+                        {% for ach in achievements %}
+                            <div class="p-2 border rounded-2 bg-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="d-block small text-navy-900">{{ ach.title }}</strong>
+                                    {% if ach.date_achieved %}
+                                        <small class="text-muted">{{ ach.date_achieved.strftime('%b %Y') }}</small>
+                                    {% endif %}
+                                    {% if ach.description %}
+                                        <small class="d-block text-secondary">{{ ach.description }}</small>
+                                    {% endif %}
+                                </div>
+                                <form method="POST" action="{{ url_for('seeker.delete_achievement', item_id=ach.id) }}" onsubmit="return confirm('Remove achievement?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No achievements recorded yet.</p>
+                {% endif %}
+            </div>
+
+            <!-- SECTION: Attached Certifications Notice -->
+            <div class="card-custom p-4 bg-white">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Included Credentials</h5>
+                        <small class="text-muted">Verified certifications automatically appear in your resume</small>
+                    </div>
+                </div>
+                <p class="small text-muted mb-2">
+                    All {{ certificates|length }} uploaded certifications are automatically linked to your downloadable resume. Credentials verified by an administrator receive prominent verified badges!
+                </p>
+                <a href="{{ url_for('seeker.dashboard') }}#uploadCertSection" class="small fw-semibold text-teal" style="color: var(--teal-600);">
+                    <i class="bi bi-plus-circle me-1"></i> Upload another certificate for verification
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

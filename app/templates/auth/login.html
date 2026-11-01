@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container">
+        <div class="card-custom shadow-lg border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="brand-badge mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </span>
+                    <h3 class="fw-bold mb-1" style="color: var(--navy-900);">Account Login</h3>
+                    <p class="text-muted small">Enter your credentials to access your portal</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+                    <!-- Built-in Session CSRF Protection Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Username or Email -->
+                    <div class="mb-3">
+                        <label for="login_identifier" class="form-label form-label-custom">Username or Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-person-fill"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-custom border-start-0" 
+                                id="login_identifier" 
+                                name="login_identifier" 
+                                value="{{ login_identifier if login_identifier else '' }}" 
+                                placeholder="e.g. john_doe or john@example.com"
+                                required 
+                                autofocus
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="password" class="form-label form-label-custom mb-0">Password</label>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="small" style="color: var(--teal-600); text-decoration: none;">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-key-fill"></i>
+                            </span>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-custom border-start-0" 
+                                id="password" 
+                                name="password" 
+                                placeholder="••••••••"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="mb-4 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember" value="true">
+                        <label class="form-check-label text-muted small" for="remember">Keep me logged in on this browser</label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-teal w-100 py-2 fs-6">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-0">
+                        Don't have an account yet? 
+                        <a href="{{ url_for('auth.register') }}" class="fw-bold" style="color: var(--teal-600); text-decoration: none;">
+                            Create an Account
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}File Too Large (413){% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-custom p-5 mx-auto" style="max-width: 540px;">
+        <span class="badge bg-warning text-dark p-3 rounded-circle mb-3 d-inline-block">
+            <i class="bi bi-file-earmark-x display-4"></i>
+        </span>
+        <h2 class="fw-bold text-navy-900 mb-2" style="color: var(--navy-900);">413 - File Exceeds Limit</h2>
+        <p class="text-secondary mb-4">
+            {{ description or 'The uploaded file exceeds the maximum allowed payload size of 16 MB. Please compress or optimize your document before retrying.' }}
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="javascript:history.back()" class="btn btn-outline-teal">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </a>
+            <a href="{{ url_for('main.index') }}" class="btn btn-teal">
+                <i class="bi bi-house-door"></i> Return Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

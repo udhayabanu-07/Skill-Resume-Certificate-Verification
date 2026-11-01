@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-container" style="max-width: 560px;">
+        <div class="card-custom shadow-lg border-0 my-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="brand-badge mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </span>
+                    <h3 class="fw-bold mb-1" style="color: var(--navy-900);">Create an Account</h3>
+                    <p class="text-muted small">Join the platform to verify skills and credentials</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <!-- Built-in Session CSRF Protection Token -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Account Type Notice (Public registration is strictly for Job Seekers) -->
+                    <div class="p-3 mb-4 rounded-3 bg-light border d-flex align-items-center gap-2">
+                        <i class="bi bi-person-badge-fill fs-5" style="color: var(--teal-600);"></i>
+                        <div>
+                            <strong class="d-block small" style="color: var(--navy-900);">Job Seeker Account Registration</strong>
+                            <small class="text-muted">Create your profile to upload resumes and submit credentials for verification.</small>
+                        </div>
+                    </div>
+
+                    <!-- Personal Information for Job Seekers -->
+                    <div id="profile-names-wrapper" class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <label for="first_name" class="form-label form-label-custom">First Name <span class="text-danger">*</span></label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-custom" 
+                                id="first_name" 
+                                name="first_name" 
+                                value="{{ first_name if first_name else '' }}" 
+                                placeholder="John"
+                                required
+                            >
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="last_name" class="form-label form-label-custom">Last Name <span class="text-danger">*</span></label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-custom" 
+                                id="last_name" 
+                                name="last_name" 
+                                value="{{ last_name if last_name else '' }}" 
+                                placeholder="Doe"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label form-label-custom">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-at"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-custom border-start-0" 
+                                id="username" 
+                                name="username" 
+                                value="{{ username if username else '' }}" 
+                                placeholder="choose_username"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label form-label-custom">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="bi bi-envelope-fill"></i>
+                            </span>
+                            <input 
+                                type="email" 
+                                class="form-control form-control-custom border-start-0" 
+                                id="email" 
+                                name="email" 
+                                value="{{ email if email else '' }}" 
+                                placeholder="john.doe@example.com"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Password and Confirmation -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-sm-6">
+                            <label for="password" class="form-label form-label-custom">Password</label>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-custom" 
+                                id="password" 
+                                name="password" 
+                                placeholder="At least 8 chars" 
+                                required
+                            >
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="confirm_password" class="form-label form-label-custom">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                class="form-control form-control-custom" 
+                                id="confirm_password" 
+                                name="confirm_password" 
+                                placeholder="Repeat password" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-teal w-100 py-2 fs-6">
+                        <i class="bi bi-check2-circle"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-0">
+                        Already have an account? 
+                        <a href="{{ url_for('auth.login') }}" class="fw-bold" style="color: var(--teal-600); text-decoration: none;">
+                            Sign In Here
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

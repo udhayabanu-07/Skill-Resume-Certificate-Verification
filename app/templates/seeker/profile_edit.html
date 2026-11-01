@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - {{ profile.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <div class="mb-3">
+        <a href="{{ url_for('seeker.view_profile') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Profile
+        </a>
+    </div>
+
+    <div class="card card-custom border-0 shadow-sm">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                <div class="rounded-3 p-3 bg-teal-subtle text-teal fs-3">
+                    <i class="bi bi-person-gear"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1" style="color: var(--navy-900);">Edit Profile & Settings</h3>
+                    <p class="text-muted small mb-0">Update your personal details, contact information, and upload an avatar photograph</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ url_for('seeker.edit_profile') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Section: Avatar Upload -->
+                <div class="row mb-4 align-items-center">
+                    <div class="col-auto">
+                        {% if profile.profile_picture %}
+                            <img src="{{ url_for('seeker.view_profile_photo', profile_id=profile.id) }}" alt="Avatar" class="rounded-circle border" style="width: 80px; height: 80px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--navy-800), var(--teal-600)); font-size: 1.75rem;">
+                                {{ profile.first_name[0] if profile.first_name else 'J' }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <label for="profile_photo" class="form-label form-label-custom small fw-bold">Profile Photograph</label>
+                        <input type="file" class="form-control form-control-custom" id="profile_photo" name="profile_photo" accept=".png,.jpg,.jpeg,.webp">
+                        <small class="text-muted">Allowed formats: PNG, JPG, JPEG, WEBP. Maximum file size: 16 MB.</small>
+                    </div>
+                </div>
+
+                <!-- Section: Personal Information -->
+                <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                    <i class="bi bi-person-fill text-teal"></i> Personal Details
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="first_name" class="form-label form-label-custom">First Name *</label>
+                        <input type="text" class="form-control form-control-custom" id="first_name" name="first_name" value="{{ profile.first_name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="last_name" class="form-label form-label-custom">Last Name *</label>
+                        <input type="text" class="form-control form-control-custom" id="last_name" name="last_name" value="{{ profile.last_name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="headline" class="form-label form-label-custom">Professional Headline</label>
+                        <input type="text" class="form-control form-control-custom" id="headline" name="headline" value="{{ profile.headline or '' }}" placeholder="e.g. Senior Cloud Engineer | Certified Kubernetes Administrator">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="phone" class="form-label form-label-custom">Phone Number</label>
+                        <input type="tel" class="form-control form-control-custom" id="phone" name="phone" value="{{ profile.phone or '' }}" placeholder="+1 (555) 000-0000">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_of_birth" class="form-label form-label-custom">Date of Birth</label>
+                        <input type="date" class="form-control form-control-custom" id="date_of_birth" name="date_of_birth" value="{{ profile.date_of_birth.strftime('%Y-%m-%d') if profile.date_of_birth else '' }}">
+                    </div>
+                </div>
+
+                <!-- Section: Location -->
+                <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                    <i class="bi bi-geo-alt-fill text-teal"></i> Location & Address
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="address" class="form-label form-label-custom">Street Address</label>
+                        <input type="text" class="form-control form-control-custom" id="address" name="address" value="{{ profile.address or '' }}" placeholder="123 Tech Boulevard">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="city" class="form-label form-label-custom">City</label>
+                        <input type="text" class="form-control form-control-custom" id="city" name="city" value="{{ profile.city or '' }}" placeholder="San Francisco">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="state" class="form-label form-label-custom">State / Province</label>
+                        <input type="text" class="form-control form-control-custom" id="state" name="state" value="{{ profile.state or '' }}" placeholder="California">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="country" class="form-label form-label-custom">Country</label>
+                        <input type="text" class="form-control form-control-custom" id="country" name="country" value="{{ profile.country or '' }}" placeholder="United States">
+                    </div>
+                </div>
+
+                <!-- Section: Professional Summary & Objective -->
+                <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                    <i class="bi bi-card-text text-teal"></i> Career Objective & Biography
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <label for="career_objective" class="form-label form-label-custom">Career Objective</label>
+                        <textarea class="form-control form-control-custom" id="career_objective" name="career_objective" rows="3" placeholder="Brief statement of your immediate career goals, strengths, and professional ambitions">{{ profile.career_objective or '' }}</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="bio" class="form-label form-label-custom">Extended Professional Bio</label>
+                        <textarea class="form-control form-control-custom" id="bio" name="bio" rows="3" placeholder="Detailed background summary showcasing your engineering or professional journey">{{ profile.bio or '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Section: Online Presence -->
+                <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                    <i class="bi bi-link-45deg text-teal"></i> Online Portfolios & Social Links
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="linkedin_url" class="form-label form-label-custom">LinkedIn URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-linkedin text-primary"></i></span>
+                            <input type="url" class="form-control form-control-custom" id="linkedin_url" name="linkedin_url" value="{{ profile.linkedin_url or '' }}" placeholder="https://linkedin.com/in/username">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="github_url" class="form-label form-label-custom">GitHub URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-github"></i></span>
+                            <input type="url" class="form-control form-control-custom" id="github_url" name="github_url" value="{{ profile.github_url or '' }}" placeholder="https://github.com/username">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="portfolio_url" class="form-label form-label-custom">Portfolio Website URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bi bi-globe text-teal"></i></span>
+                            <input type="url" class="form-control form-control-custom" id="portfolio_url" name="portfolio_url" value="{{ profile.portfolio_url or '' }}" placeholder="https://myportfolio.dev">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a href="{{ url_for('seeker.view_profile') }}" class="btn btn-outline-secondary px-4 py-2">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-teal px-5 py-2">
+                        <i class="bi bi-check-circle"></i> Save Profile Details
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

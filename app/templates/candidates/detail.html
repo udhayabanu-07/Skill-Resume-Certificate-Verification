@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile.full_name }} - Verified Candidate Profile{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb / Back button -->
+    <div class="mb-3">
+        <a href="{{ url_for('main.candidates_directory') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Candidate Directory
+        </a>
+    </div>
+
+    <!-- Candidate Header Card -->
+    <div class="card card-custom border-0 shadow-sm mb-4">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex flex-column flex-md-row align-items-center gap-4">
+                {% if profile.profile_picture %}
+                    <img src="{{ url_for('seeker.view_profile_photo', profile_id=profile.id) }}" alt="{{ profile.full_name }}" class="rounded-circle border shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" style="width: 120px; height: 120px; background: linear-gradient(135deg, var(--navy-800), var(--teal-600)); font-size: 2.75rem;">
+                        {{ profile.first_name[0] if profile.first_name else 'J' }}{{ profile.last_name[0] if profile.last_name else 'S' }}
+                    </div>
+                {% endif %}
+
+                <div class="text-center text-md-start flex-grow-1">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 mb-2">
+                        <h2 class="fw-bold mb-0" style="color: var(--navy-900);">
+                            {{ profile.full_name }}
+                        </h2>
+                        {% if verified_certs %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+                                <i class="bi bi-patch-check-fill"></i> Verified Candidate
+                            </span>
+                        {% endif %}
+                    </div>
+                    <p class="lead text-teal mb-2 fw-semibold">{{ profile.headline or 'Professional Candidate' }}</p>
+
+                    <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-3 text-muted small">
+                        {% if profile.city or profile.country %}
+                            <span><i class="bi bi-geo-alt-fill text-muted"></i> {{ profile.city }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country }}</span>
+                        {% endif %}
+                        {% if profile.linkedin_url %}
+                            <a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted">
+                                <i class="bi bi-linkedin text-primary"></i> LinkedIn Profile
+                            </a>
+                        {% endif %}
+                        {% if profile.github_url %}
+                            <a href="{{ profile.github_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted">
+                                <i class="bi bi-github text-dark"></i> GitHub
+                            </a>
+                        {% endif %}
+                        {% if profile.portfolio_url %}
+                            <a href="{{ profile.portfolio_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none text-muted">
+                                <i class="bi bi-globe text-teal"></i> Portfolio
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Career Objective / Bio -->
+            {% if profile.effective_objective %}
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                            <i class="bi bi-file-text-fill text-teal"></i> Professional Summary & Objective
+                        </h5>
+                        <p class="text-secondary mb-0 leading-relaxed">{{ profile.effective_objective }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Verified Credentials -->
+            <div class="card card-custom border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--navy-900);">
+                            <i class="bi bi-patch-check-fill text-success"></i> Verified Certifications
+                        </h5>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            {{ verified_certs|length }} Verified
+                        </span>
+                    </div>
+
+                    {% if verified_certs %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for cert in verified_certs %}
+                                <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-dark">{{ cert.title }}</h6>
+                                        <p class="small text-muted mb-1">
+                                            Issued by <strong>{{ cert.issuing_organization }}</strong>
+                                            {% if cert.issue_date %} &bull; {{ cert.issue_date.strftime('%B %Y') }}{% endif %}
+                                        </p>
+                                        {% if cert.credential_id %}
+                                            <span class="badge bg-white text-muted border small">ID: {{ cert.credential_id }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-success px-2 py-1">
+                                            <i class="bi bi-shield-check"></i> Verified
+                                        </span>
+                                        {% if cert.verified_at %}
+                                            <small class="d-block text-muted mt-1" style="font-size: 0.75rem;">
+                                                Verified on {{ cert.verified_at.strftime('%d %b %Y') }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No verified credentials have been published by this candidate yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Work Experience -->
+            {% if experiences %}
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                            <i class="bi bi-briefcase-fill text-teal"></i> Work Experience
+                        </h5>
+                        <div class="d-flex flex-column gap-3">
+                            {% for exp in experiences %}
+                                <div class="border-start border-3 border-teal ps-3 py-1">
+                                    <div class="d-flex justify-content-between align-items-baseline">
+                                        <h6 class="fw-bold mb-0 text-dark">{{ exp.job_title }}</h6>
+                                        <small class="text-muted">
+                                            {{ exp.start_date.strftime('%b %Y') if exp.start_date else '' }} – 
+                                            {% if exp.is_current %}Present{% else %}{{ exp.end_date.strftime('%b %Y') if exp.end_date else '' }}{% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="small fw-semibold text-teal mb-1">{{ exp.company }}{% if exp.location %} &bull; <span class="text-muted">{{ exp.location }}</span>{% endif %}</div>
+                                    {% if exp.description %}
+                                        <p class="small text-muted mb-0">{{ exp.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Projects -->
+            {% if projects %}
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                            <i class="bi bi-code-square text-teal"></i> Featured Projects
+                        </h5>
+                        <div class="row g-3">
+                            {% for proj in projects %}
+                                <div class="col-12">
+                                    <div class="p-3 bg-light rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <h6 class="fw-bold mb-0 text-dark">{{ proj.title }}</h6>
+                                            {% if proj.project_url %}
+                                                <a href="{{ proj.project_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-teal">
+                                                    <i class="bi bi-box-arrow-up-right"></i> Live Project
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        {% if proj.technologies %}
+                                            <div class="small text-teal fw-semibold mb-2">{{ proj.technologies }}</div>
+                                        {% endif %}
+                                        {% if proj.description %}
+                                            <p class="small text-muted mb-0">{{ proj.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Technical & Soft Skills -->
+            <div class="card card-custom border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-tools text-teal"></i> Skills & Proficiencies
+                    </h5>
+                    {% if skills %}
+                        <div class="d-flex flex-column gap-2">
+                            {% for skill in skills %}
+                                <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light border">
+                                    <div>
+                                        <span class="fw-semibold text-dark">{{ skill.name }}</span>
+                                        {% if skill.category == 'soft' %}
+                                            <span class="badge bg-secondary-subtle text-secondary small ms-1">Soft</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        <span class="badge bg-light text-muted border small">{{ skill.proficiency_level.capitalize() }}</span>
+                                        {% if skill.is_verified %}
+                                            <i class="bi bi-patch-check-fill text-success" title="Verified Skill"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No skills listed yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Education -->
+            {% if educations %}
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                            <i class="bi bi-mortarboard-fill text-teal"></i> Education
+                        </h5>
+                        <div class="d-flex flex-column gap-3">
+                            {% for edu in educations %}
+                                <div class="border-start border-3 border-teal ps-3 py-1">
+                                    <h6 class="fw-bold mb-0 text-dark">{{ edu.degree }}{% if edu.field_of_study %} in {{ edu.field_of_study }}{% endif %}</h6>
+                                    <small class="text-teal fw-semibold d-block">{{ edu.institution }}</small>
+                                    <small class="text-muted">
+                                        {{ edu.start_date.strftime('%Y') if edu.start_date else '' }} – {{ edu.end_date.strftime('%Y') if edu.end_date else '' }}
+                                        {% if edu.grade_or_cgpa %}&bull; GPA: {{ edu.grade_or_cgpa }}{% endif %}
+                                    </small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Achievements -->
+            {% if achievements %}
+                <div class="card card-custom border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                            <i class="bi bi-trophy-fill text-warning"></i> Honors & Awards
+                        </h5>
+                        <div class="d-flex flex-column gap-2">
+                            {% for ach in achievements %}
+                                <div class="p-2 bg-light rounded border">
+                                    <div class="d-flex justify-content-between">
+                                        <strong class="text-dark small">{{ ach.title }}</strong>
+                                        {% if ach.date_achieved %}
+                                            <small class="text-muted">{{ ach.date_achieved.strftime('%Y') }}</small>
+                                        {% endif %}
+                                    </div>
+                                    {% if ach.description %}
+                                        <p class="small text-muted mb-0 mt-1">{{ ach.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

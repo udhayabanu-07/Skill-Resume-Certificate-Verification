@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}User #{{ user.id }} - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Back button -->
+    <div class="mb-3">
+        <a href="{{ url_for('admin.users_list') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to User Accounts
+        </a>
+    </div>
+
+    <!-- User Header Card -->
+    <div class="card card-custom border-0 shadow-sm mb-4">
+        <div class="card-body p-4 p-md-5">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold fs-3" style="width: 72px; height: 72px; background: linear-gradient(135deg, var(--navy-800), var(--teal-600));">
+                        {{ user.username[0].upper() }}
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h3 class="fw-bold mb-0 text-dark">{{ user.username }}</h3>
+                            <span class="badge {% if user.is_admin %}bg-primary{% else %}bg-secondary{% endif %}">
+                                {{ user.role.upper() }}
+                            </span>
+                            <span class="badge {% if user.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if user.is_active %}ACTIVE{% else %}DEACTIVATED{% endif %}
+                            </span>
+                        </div>
+                        <p class="text-muted small mb-0">{{ user.email }} &bull; Joined {{ user.created_at.strftime('%d %B %Y') }}</p>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    {% if user.id != current_user.id %}
+                        <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=user.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn {% if user.is_active %}btn-outline-danger{% else %}btn-success{% endif %}">
+                                {% if user.is_active %}
+                                    <i class="bi bi-slash-circle"></i> Deactivate Account
+                                {% else %}
+                                    <i class="bi bi-check-circle"></i> Activate Account
+                                {% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if user.is_job_seeker and profile %}
+                        <a href="{{ url_for('admin.view_seeker_resume', user_id=user.id) }}" class="btn btn-teal">
+                            <i class="bi bi-file-earmark-person"></i> View Candidate Resume
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Profile Details -->
+    {% if profile %}
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card card-custom border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-person-badge text-teal"></i> Personal Profile Information
+                    </h5>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="text-muted fw-semibold" style="width: 35%;">Full Name:</td>
+                            <td class="fw-bold text-dark">{{ profile.full_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Headline:</td>
+                            <td>{{ profile.headline or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Phone:</td>
+                            <td>{{ profile.phone or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Date of Birth:</td>
+                            <td>{{ profile.date_of_birth.strftime('%d %B %Y') if profile.date_of_birth else 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Location:</td>
+                            <td>{{ profile.city or '' }}{% if profile.city and profile.country %}, {% endif %}{{ profile.country or 'Not specified' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Profile Completion:</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="progress flex-grow-1" style="height: 8px;">
+                                        <div class="progress-bar bg-teal" role="progressbar" style="width: {{ profile.profile_completion_percentage }}%;"></div>
+                                    </div>
+                                    <span class="small fw-bold">{{ profile.profile_completion_percentage }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card card-custom border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-link-45deg text-teal"></i> Social & Online Portfolio
+                    </h5>
+                    <table class="table table-sm table-borderless">
+                        <tr>
+                            <td class="text-muted fw-semibold" style="width: 35%;">LinkedIn:</td>
+                            <td>
+                                {% if profile.linkedin_url %}
+                                    <a href="{{ profile.linkedin_url }}" target="_blank" class="text-primary text-decoration-none">
+                                        <i class="bi bi-box-arrow-up-right small"></i> {{ profile.linkedin_url }}
+                                    </a>
+                                {% else %}<span class="text-muted">None</span>{% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">GitHub:</td>
+                            <td>
+                                {% if profile.github_url %}
+                                    <a href="{{ profile.github_url }}" target="_blank" class="text-dark text-decoration-none">
+                                        <i class="bi bi-box-arrow-up-right small"></i> {{ profile.github_url }}
+                                    </a>
+                                {% else %}<span class="text-muted">None</span>{% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted fw-semibold">Portfolio:</td>
+                            <td>
+                                {% if profile.portfolio_url %}
+                                    <a href="{{ profile.portfolio_url }}" target="_blank" class="text-teal text-decoration-none">
+                                        <i class="bi bi-box-arrow-up-right small"></i> {{ profile.portfolio_url }}
+                                    </a>
+                                {% else %}<span class="text-muted">None</span>{% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uploaded Resumes and Certificates -->
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card card-custom border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-file-earmark-text text-teal"></i> Uploaded Resume Documents ({{ resumes|length }})
+                    </h5>
+                    {% if resumes %}
+                        <div class="list-group list-group-flush">
+                            {% for r in resumes %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <div class="fw-semibold text-dark">{{ r.original_filename }}</div>
+                                        <small class="text-muted">{{ (r.file_size / 1024)|round(1) }} KB &bull; Uploaded {{ r.uploaded_at.strftime('%d %b %Y') }}</small>
+                                    </div>
+                                    <a href="{{ url_for('seeker.view_uploaded_resume', resume_id=r.id) }}" target="_blank" class="btn btn-sm btn-outline-teal">
+                                        <i class="bi bi-download"></i> View
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No resume documents uploaded.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card card-custom border-0 shadow-sm p-4 h-100">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-patch-check text-teal"></i> Submitted Certificates ({{ certificates|length }})
+                    </h5>
+                    {% if certificates %}
+                        <div class="list-group list-group-flush">
+                            {% for c in certificates %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <div class="fw-semibold text-dark">{{ c.title }}</div>
+                                        <small class="text-muted">{{ c.issuing_organization }}</small>
+                                        <div class="mt-1">
+                                            {% if c.status == 'verified' %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle small">Verified</span>
+                                            {% elif c.status == 'rejected' %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle small">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-warning-subtle text-warning border small">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <a href="{{ url_for('verification.view_certificate', cert_id=c.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-eye"></i> View Doc
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No certificates submitted.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card card-custom border-0 shadow-sm p-5 text-center">
+            <p class="text-muted mb-0">This account is an Administrator without a Job Seeker profile.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

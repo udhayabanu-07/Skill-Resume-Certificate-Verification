@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Certificate - {{ certificate.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <div class="mb-3">
+        <a href="{{ url_for('seeker.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-custom border-0 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <div class="rounded-3 p-3 bg-teal-subtle text-teal fs-3">
+                            <i class="bi bi-patch-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="fw-bold mb-1" style="color: var(--navy-900);">Edit Certificate Details</h3>
+                            <p class="text-muted small mb-0">Update metadata or upload a revised document for review</p>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('seeker.edit_certificate', cert_id=certificate.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label form-label-custom">Certificate Name / Title *</label>
+                            <input type="text" class="form-control form-control-custom" id="title" name="title" value="{{ certificate.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="issuing_organization" class="form-label form-label-custom">Issuing Organization *</label>
+                            <input type="text" class="form-control form-control-custom" id="issuing_organization" name="issuing_organization" value="{{ certificate.issuing_organization }}" required placeholder="e.g. AWS, Google Cloud, Cisco, Microsoft">
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="issue_date" class="form-label form-label-custom">Issue Date</label>
+                                <input type="date" class="form-control form-control-custom" id="issue_date" name="issue_date" value="{{ certificate.issue_date.strftime('%Y-%m-%d') if certificate.issue_date else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="expiration_date" class="form-label form-label-custom">Expiration Date (Optional)</label>
+                                <input type="date" class="form-control form-control-custom" id="expiration_date" name="expiration_date" value="{{ certificate.expiration_date.strftime('%Y-%m-%d') if certificate.expiration_date else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="credential_id" class="form-label form-label-custom">Credential ID / License Number</label>
+                                <input type="text" class="form-control form-control-custom" id="credential_id" name="credential_id" value="{{ certificate.credential_id or '' }}" placeholder="e.g. AWS-PSA-12345">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="credential_url" class="form-label form-label-custom">Verification URL</label>
+                                <input type="url" class="form-control form-control-custom" id="credential_url" name="credential_url" value="{{ certificate.credential_url or '' }}" placeholder="https://verify.issuer.org/cert/12345">
+                            </div>
+                        </div>
+
+                        <!-- Current File Info -->
+                        <div class="mb-3 p-3 bg-light rounded border">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block">Current Document:</small>
+                                    <strong>{{ certificate.original_filename }}</strong>
+                                    <span class="text-muted small">({{ (certificate.file_size / 1024)|round(1) }} KB)</span>
+                                </div>
+                                <a href="{{ url_for('seeker.view_certificate', cert_id=certificate.id) }}" target="_blank" class="btn btn-sm btn-outline-teal">
+                                    <i class="bi bi-eye"></i> View Current File
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Replace Document (Optional) -->
+                        <div class="mb-4">
+                            <label for="certificate_file" class="form-label form-label-custom">Replace Certificate Document (Optional)</label>
+                            <input type="file" class="form-control form-control-custom" id="certificate_file" name="certificate_file" accept=".pdf,.png,.jpg,.jpeg">
+                            <small class="text-muted">Upload only if you want to replace the existing file (PDF, PNG, JPG). Re-uploading will re-submit the certificate for administrator review.</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <a href="{{ url_for('seeker.dashboard') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-teal px-4">
+                                <i class="bi bi-check-circle"></i> Save Certificate Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Bad Request (400){% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-custom p-5 mx-auto" style="max-width: 540px;">
+        <span class="badge bg-warning text-dark p-3 rounded-circle mb-3 d-inline-block">
+            <i class="bi bi-shield-exclamation display-4"></i>
+        </span>
+        <h2 class="fw-bold text-navy-900 mb-2" style="color: var(--navy-900);">400 - Request Error</h2>
+        <p class="text-secondary mb-4">
+            {{ description or 'The request could not be processed due to invalid parameters or an expired security token.' }}
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="javascript:history.back()" class="btn btn-outline-teal">
+                <i class="bi bi-arrow-left"></i> Go Back
+            </a>
+            <a href="{{ url_for('main.index') }}" class="btn btn-teal">
+                <i class="bi bi-house-door"></i> Return Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

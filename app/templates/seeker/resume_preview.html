@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile.full_name }} - Resume Preview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resume-paper {
+        background: #ffffff;
+        max-width: 860px;
+        margin: 2rem auto;
+        padding: 3.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(11, 37, 69, 0.08);
+        border: 1px solid #e2e8f0;
+        font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        color: #1e293b;
+    }
+    .resume-section-title {
+        font-size: 0.88rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--navy-900);
+        margin-bottom: 0.35rem;
+        position: relative;
+    }
+    .resume-divider {
+        height: 2px;
+        background: linear-gradient(90deg, var(--teal-500) 0%, #e2e8f0 100%);
+        border: none;
+        margin-bottom: 1rem;
+        margin-top: 0;
+    }
+    @media print {
+        body { background: #ffffff !important; }
+        .no-print { display: none !important; }
+        .resume-paper { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Action Toolbar (Hidden in Print) -->
+    <div class="card-custom p-3 mb-4 bg-white no-print">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-2">
+                {% if is_admin_view %}
+                    <a href="{{ url_for('admin.resumes_list') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> All Candidates
+                    </a>
+                    <span class="badge bg-danger">Admin View Mode</span>
+                {% else %}
+                    <a href="{{ url_for('seeker.dashboard') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Dashboard
+                    </a>
+                    <a href="{{ url_for('seeker.resume_builder') }}" class="btn btn-sm btn-outline-teal">
+                        <i class="bi bi-pencil-square"></i> Edit Resume
+                    </a>
+                {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print();">
+                    <i class="bi bi-printer-fill me-1"></i> Print
+                </button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm btn-teal dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-download me-1"></i> Download PDF
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2">
+                        <li><h6 class="dropdown-header text-uppercase small fw-bold">Select Template Style</h6></li>
+                        {% if is_admin_view %}
+                            <li><a class="dropdown-item" href="{{ url_for('admin.download_seeker_resume_pdf', user_id=profile.user_id, template='modern') }}"><i class="bi bi-palette-fill text-teal me-2"></i> Modern Clean (Navy/Teal)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.download_seeker_resume_pdf', user_id=profile.user_id, template='executive') }}"><i class="bi bi-briefcase-fill text-primary me-2"></i> Corporate Executive (Slate)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.download_seeker_resume_pdf', user_id=profile.user_id, template='minimal') }}"><i class="bi bi-file-text-fill text-dark me-2"></i> Minimalist Classic</a></li>
+                        {% else %}
+                            <li><a class="dropdown-item" href="{{ url_for('seeker.resume_download_pdf', template='modern') }}"><i class="bi bi-palette-fill text-teal me-2"></i> Modern Clean (Navy/Teal)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('seeker.resume_download_pdf', template='executive') }}"><i class="bi bi-briefcase-fill text-primary me-2"></i> Corporate Executive (Slate)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('seeker.resume_download_pdf', template='minimal') }}"><i class="bi bi-file-text-fill text-dark me-2"></i> Minimalist Classic</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Document View -->
+    <div class="resume-paper">
+        <!-- Header: Candidate Information -->
+        <div class="text-center mb-4">
+            <h1 class="fw-bold mb-1" style="color: var(--navy-900); font-size: 2.2rem; letter-spacing: -0.02em;">
+                {{ profile.full_name or profile.user.username }}
+            </h1>
+            {% if profile.headline %}
+                <h5 class="fw-semibold mb-2" style="color: var(--teal-600); font-size: 1.15rem;">
+                    {{ profile.headline }}
+                </h5>
+            {% endif %}
+
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 text-secondary small mt-2">
+                {% if profile.user.email %}
+                    <span><i class="bi bi-envelope text-teal"></i> {{ profile.user.email }}</span>
+                {% endif %}
+                {% if profile.phone %}
+                    <span><i class="bi bi-telephone text-teal"></i> {{ profile.phone }}</span>
+                {% endif %}
+                {% if profile.city or profile.country %}
+                    <span><i class="bi bi-geo-alt text-teal"></i> {{ [profile.city, profile.country]|select|join(', ') }}</span>
+                {% endif %}
+                {% if profile.linkedin_url %}
+                    <span><a href="{{ profile.linkedin_url }}" target="_blank" class="text-secondary text-decoration-none"><i class="bi bi-linkedin text-teal"></i> LinkedIn</a></span>
+                {% endif %}
+                {% if profile.github_url %}
+                    <span><a href="{{ profile.github_url }}" target="_blank" class="text-secondary text-decoration-none"><i class="bi bi-github text-teal"></i> GitHub</a></span>
+                {% endif %}
+                {% if profile.portfolio_url %}
+                    <span><a href="{{ profile.portfolio_url }}" target="_blank" class="text-secondary text-decoration-none"><i class="bi bi-globe text-teal"></i> Portfolio</a></span>
+                {% endif %}
+            </div>
+        </div>
+
+        <hr class="resume-divider mb-4">
+
+        <!-- Career Objective / Summary -->
+        {% if profile.effective_objective %}
+            <div class="mb-4">
+                <div class="resume-section-title">Career Objective / Summary</div>
+                <hr class="resume-divider">
+                <p class="text-secondary small mb-0" style="line-height: 1.65;">
+                    {{ profile.effective_objective }}
+                </p>
+            </div>
+        {% endif %}
+
+        <!-- Work Experience -->
+        {% if experiences %}
+            <div class="mb-4">
+                <div class="resume-section-title">Work Experience</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-column gap-3">
+                    {% for exp in experiences %}
+                        <div>
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <div>
+                                    <strong class="text-navy-900" style="font-size: 1.02rem;">{{ exp.job_title }}</strong>
+                                    <span class="text-teal fw-semibold" style="color: var(--teal-600);"> — {{ exp.company }}</span>
+                                    {% if exp.location %}
+                                        <small class="text-muted fst-italic">({{ exp.location }})</small>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted fw-semibold flex-shrink-0">
+                                    {{ exp.start_date.strftime('%b %Y') if exp.start_date else '' }} – 
+                                    {{ 'Present' if exp.is_current else (exp.end_date.strftime('%b %Y') if exp.end_date else '') }}
+                                </small>
+                            </div>
+                            {% if exp.description %}
+                                <p class="text-secondary small mb-0" style="line-height: 1.6;">{{ exp.description }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Education -->
+        {% if educations %}
+            <div class="mb-4">
+                <div class="resume-section-title">Education</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-column gap-3">
+                    {% for edu in educations %}
+                        <div>
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <div>
+                                    <strong class="text-navy-900">{{ edu.degree }}</strong>
+                                    {% if edu.field_of_study %}
+                                        <span> in {{ edu.field_of_study }}</span>
+                                    {% endif %}
+                                    <span class="text-teal" style="color: var(--teal-600);"> — {{ edu.institution }}</span>
+                                </div>
+                                <small class="text-muted fw-semibold flex-shrink-0">
+                                    {{ edu.start_date.strftime('%Y') if edu.start_date else '' }} – {{ edu.end_date.strftime('%Y') if edu.end_date else '' }}
+                                </small>
+                            </div>
+                            {% if edu.grade_or_cgpa %}
+                                <small class="text-muted d-block">CGPA / Grade: <strong>{{ edu.grade_or_cgpa }}</strong></small>
+                            {% endif %}
+                            {% if edu.description %}
+                                <p class="text-secondary small mb-0 mt-1">{{ edu.description }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Technical Skills -->
+        {% if skills %}
+            <div class="mb-4">
+                <div class="resume-section-title">Technical Skills</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for s in skills %}
+                        <span class="badge border py-2 px-3 text-dark bg-light d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-check2 text-teal fw-bold" style="color: var(--teal-500);"></i>
+                            <strong>{{ s.name }}</strong>
+                            <small class="text-muted">({{ s.proficiency_level.capitalize() }})</small>
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Projects -->
+        {% if projects %}
+            <div class="mb-4">
+                <div class="resume-section-title">Projects & Portfolio</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-column gap-3">
+                    {% for proj in projects %}
+                        <div>
+                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                <div>
+                                    <strong class="text-navy-900">{{ proj.title }}</strong>
+                                    {% if proj.technologies %}
+                                        <small class="text-muted fst-italic ms-1">[{{ proj.technologies }}]</small>
+                                    {% endif %}
+                                </div>
+                                {% if proj.project_url %}
+                                    <small>
+                                        <a href="{{ proj.project_url }}" target="_blank" class="text-teal text-decoration-none">
+                                            <i class="bi bi-link-45deg"></i> Link
+                                        </a>
+                                    </small>
+                                {% endif %}
+                            </div>
+                            {% if proj.description %}
+                                <p class="text-secondary small mb-0" style="line-height: 1.6;">{{ proj.description }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Certifications & Credentials -->
+        {% if certificates %}
+            <div class="mb-4">
+                <div class="resume-section-title">Certifications & Verified Credentials</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-column gap-2">
+                    {% for cert in certificates %}
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <div>
+                                <strong class="text-navy-900">{{ cert.title }}</strong>
+                                <span class="text-secondary small"> — {{ cert.issuing_organization }}</span>
+                                {% if cert.credential_id %}
+                                    <small class="text-muted ms-1">(ID: <code>{{ cert.credential_id }}</code>)</small>
+                                {% endif %}
+                            </div>
+                            <div class="text-end flex-shrink-0">
+                                {% if cert.status == 'verified' %}
+                                    <span class="status-badge verified" style="font-size: 0.72rem;">
+                                        <i class="bi bi-shield-check"></i> Verified
+                                    </span>
+                                {% elif cert.status == 'pending' %}
+                                    <span class="status-badge pending" style="font-size: 0.72rem;">
+                                        Pending Review
+                                    </span>
+                                {% endif %}
+                                <small class="text-muted ms-2">{{ cert.issue_date.strftime('%b %Y') if cert.issue_date else '' }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Honors & Achievements -->
+        {% if achievements %}
+            <div class="mb-3">
+                <div class="resume-section-title">Honors & Achievements</div>
+                <hr class="resume-divider">
+                <div class="d-flex flex-column gap-2">
+                    {% for ach in achievements %}
+                        <div class="d-flex justify-content-between align-items-baseline">
+                            <div>
+                                <strong class="text-navy-900 small">{{ ach.title }}</strong>
+                                {% if ach.description %}
+                                    <span class="text-secondary small"> — {{ ach.description }}</span>
+                                {% endif %}
+                            </div>
+                            {% if ach.date_achieved %}
+                                <small class="text-muted flex-shrink-0">{{ ach.date_achieved.strftime('%b %Y') }}</small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard{% endblock %}
+
+{% block extra_css %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header banner -->
+    <div class="card card-custom p-4 mb-4 bg-white border-0 shadow-sm">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon navy" style="width: 58px; height: 58px; font-size: 1.8rem;">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1" style="color: var(--navy-900);">Verification Administration</h3>
+                    <p class="text-muted small mb-0">System-wide credential auditing, candidate reviews, user management, and compliance</p>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('verification.queue') }}" class="btn btn-teal">
+                    <i class="bi bi-shield-check"></i> Verification Queue ({{ stats.pending_certificates }})
+                </a>
+                <a href="{{ url_for('admin.users_list') }}" class="btn btn-outline-navy">
+                    <i class="bi bi-people-fill"></i> Manage Users
+                </a>
+                <a href="{{ url_for('reports.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-bar-chart-line"></i> Reports
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Links Grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('verification.queue') }}" class="card card-custom border-0 shadow-sm p-3 text-decoration-none h-100 hover-elevate">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-warning-subtle text-warning fs-4">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-dark">{{ stats.pending_certificates }}</div>
+                        <small class="text-muted">Pending Audits</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.resumes_list') }}" class="card card-custom border-0 shadow-sm p-3 text-decoration-none h-100 hover-elevate">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-success-subtle text-success fs-4">
+                        <i class="bi bi-patch-check-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-dark">{{ stats.verified_certificates }}</div>
+                        <small class="text-muted">Verified Certs</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.users_list') }}" class="card card-custom border-0 shadow-sm p-3 text-decoration-none h-100 hover-elevate">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-primary-subtle text-primary fs-4">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-dark">{{ stats.total_users }}</div>
+                        <small class="text-muted">Registered Users</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('admin.resumes_list') }}" class="card card-custom border-0 shadow-sm p-3 text-decoration-none h-100 hover-elevate">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-3 p-3 bg-info-subtle text-info fs-4">
+                        <i class="bi bi-file-earmark-person-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fs-4 fw-bold text-dark">{{ stats.total_resumes }}</div>
+                        <small class="text-muted">Uploaded Resumes</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Charts & Action Section -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-5">
+            <div class="card card-custom border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: var(--navy-900);">
+                        <i class="bi bi-pie-chart-fill text-teal"></i> Credential Distribution
+                    </h5>
+                    <div style="max-height: 240px; position: relative;">
+                        <canvas id="adminStatusChart"></canvas>
+                    </div>
+                    <div class="d-flex justify-content-around mt-3 text-center small text-muted">
+                        <div><strong class="text-success">{{ stats.verified_certificates }}</strong> Approved</div>
+                        <div><strong class="text-warning">{{ stats.pending_certificates }}</strong> In Review</div>
+                        <div><strong class="text-danger">{{ stats.rejected_certificates }}</strong> Rejected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card card-custom border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="fw-bold mb-2" style="color: var(--navy-900);">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i> Administrator Quick Access
+                        </h5>
+                        <p class="text-muted small mb-3">Key actions for monitoring credential compliance and platform integrity.</p>
+                        
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <a href="{{ url_for('verification.queue') }}" class="btn btn-light border w-100 text-start p-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-shield-check text-teal fs-4"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Review Queue</div>
+                                        <small class="text-muted">{{ stats.pending_certificates }} certificates waiting</small>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <a href="{{ url_for('admin.users_list') }}" class="btn btn-light border w-100 text-start p-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-person-gear text-navy fs-4"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark small">User Accounts</div>
+                                        <small class="text-muted">Search, inspect, toggle active</small>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <a href="{{ url_for('admin.resumes_list') }}" class="btn btn-light border w-100 text-start p-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Candidate Resumes</div>
+                                        <small class="text-muted">Preview & download PDFs</small>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <a href="{{ url_for('admin.verification_history') }}" class="btn btn-light border w-100 text-start p-3 d-flex align-items-center gap-2">
+                                    <i class="bi bi-journal-text text-success fs-4"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark small">Audit Decisions</div>
+                                        <small class="text-muted">Full immutable audit logs</small>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top mt-3 d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Platform Status: <span class="badge bg-success">Operational</span></small>
+                        <a href="{{ url_for('reports.index') }}" class="small fw-semibold text-teal text-decoration-none">
+                            View Comprehensive Analytics <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Audit Logs Table -->
+    <div class="card card-custom border-0 shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">
+                <i class="bi bi-journal-text text-teal me-2"></i>
+                Recent Verification Decisions Log
+            </h5>
+            <a href="{{ url_for('admin.verification_history') }}" class="small text-teal text-decoration-none">
+                View Full Audit History <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        {% if recent_verifications %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Audit ID</th>
+                            <th>Certificate ID</th>
+                            <th>Reviewer</th>
+                            <th>Action</th>
+                            <th>Remarks</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in recent_verifications %}
+                            <tr>
+                                <td class="fw-bold text-muted">#{{ record.id }}</td>
+                                <td>
+                                    <a href="{{ url_for('verification.view_certificate', cert_id=record.certificate_id) }}" target="_blank" class="text-decoration-none fw-semibold">
+                                        Cert #{{ record.certificate_id }}
+                                    </a>
+                                </td>
+                                <td>{{ record.admin_user.username if record.admin_user else 'System' }}</td>
+                                <td>
+                                    {% if record.action == 'verified' %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                            <i class="bi bi-check-circle-fill"></i> Verified
+                                        </span>
+                                    {% elif record.action == 'rejected' %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                            <i class="bi bi-x-circle-fill"></i> Rejected
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning border px-2 py-1">
+                                            {{ record.action.capitalize() }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ record.remarks or 'N/A' }}</td>
+                                <td class="text-muted small">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-4 text-center rounded-3 bg-light">
+                <i class="bi bi-shield-check display-5 text-muted mb-2 d-block"></i>
+                <p class="text-secondary mb-1">No verification records logged yet.</p>
+                <small class="text-muted">Decisions made inside the verification queue will generate auditable logs here.</small>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('adminStatusChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Approved', 'Pending', 'Rejected'],
+            datasets: [{
+                data: [
+                    {{ stats.verified_certificates }},
+                    {{ stats.pending_certificates }},
+                    {{ stats.rejected_certificates }}
+                ],
+                backgroundColor: ['#059669', '#D97706', '#DC2626'],
+                borderWidth: 2,
+                borderColor: '#FFFFFF'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

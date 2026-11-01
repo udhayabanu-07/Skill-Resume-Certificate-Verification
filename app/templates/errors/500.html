@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Internal Server Error (500){% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-custom p-5 mx-auto" style="max-width: 540px;">
+        <span class="badge bg-danger text-white p-3 rounded-circle mb-3 d-inline-block">
+            <i class="bi bi-exclamation-triangle-fill display-4"></i>
+        </span>
+        <h2 class="fw-bold text-navy-900 mb-2" style="color: var(--navy-900);">500 - Internal Server Error</h2>
+        <p class="text-secondary mb-4">
+            An unexpected server condition occurred while processing this transaction. Our engineering logs have captured this incident.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('main.index') }}" class="btn btn-teal">
+                <i class="bi bi-house-door"></i> Return to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

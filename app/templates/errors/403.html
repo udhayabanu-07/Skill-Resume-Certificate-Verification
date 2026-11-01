@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Access Forbidden (403){% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-custom p-5 mx-auto" style="max-width: 540px;">
+        <span class="badge bg-danger text-white p-3 rounded-circle mb-3 d-inline-block">
+            <i class="bi bi-shield-x display-4"></i>
+        </span>
+        <h2 class="fw-bold text-navy-900 mb-2" style="color: var(--navy-900);">403 - Access Forbidden</h2>
+        <p class="text-secondary mb-4">
+            You do not have administrative clearance to access this protected area. Only authorized reviewers may view verification queues.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('auth.dashboard_redirect') }}" class="btn btn-teal">
+                <i class="bi bi-grid-fill"></i> My Dashboard
+            </a>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-teal">
+                <i class="bi bi-house-door"></i> Return Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

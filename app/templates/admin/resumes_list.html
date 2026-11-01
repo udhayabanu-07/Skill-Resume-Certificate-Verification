@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Resumes Directory{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header banner -->
+    <div class="card-custom p-4 mb-4 bg-white">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h3 class="fw-bold mb-1 text-navy-900" style="color: var(--navy-900);">Candidate Resumes Directory</h3>
+                <p class="text-muted small mb-0">Authorized Admin Access • Review candidate profiles, digital CVs, and uploaded documents</p>
+            </div>
+            <span class="badge bg-navy py-2 px-3 fs-6" style="background: var(--navy-800);">
+                <i class="bi bi-people-fill me-1"></i> {{ seekers|length }} Candidates
+            </span>
+        </div>
+    </div>
+
+    <!-- Candidate List Table -->
+    <div class="card-custom p-4 bg-white">
+        {% if seekers %}
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Headline</th>
+                            <th>Contact</th>
+                            <th>Certifications</th>
+                            <th>Uploaded Docs</th>
+                            <th class="text-end">Resume Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for seeker in seekers %}
+                            <tr>
+                                <td>
+                                    <strong class="d-block text-navy-900">{{ seeker.full_name }}</strong>
+                                    <small class="text-muted">@{{ seeker.user.username }}</small>
+                                </td>
+                                <td>
+                                    <span class="small text-secondary">{{ seeker.headline or 'Not specified' }}</span>
+                                </td>
+                                <td class="small text-muted">
+                                    <div>{{ seeker.user.email }}</div>
+                                    {% if seeker.phone %}<div>{{ seeker.phone }}</div>{% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success border border-success border-opacity-25">
+                                        {{ seeker.certificates.filter_by(status='verified').count() }} Verified
+                                    </span>
+                                    <small class="text-muted d-block mt-1">{{ seeker.certificates.count() }} total</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ seeker.resumes.count() }} files
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="{{ url_for('admin.view_seeker_resume', user_id=seeker.user_id) }}" class="btn btn-sm btn-outline-teal" title="View Digital Resume">
+                                            <i class="bi bi-eye"></i> View CV
+                                        </a>
+                                        <a href="{{ url_for('admin.download_seeker_resume_pdf', user_id=seeker.user_id) }}" class="btn btn-sm btn-teal" title="Download PDF">
+                                            <i class="bi bi-download"></i> PDF
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-5 text-center rounded-3 bg-light">
+                <i class="bi bi-people display-4 text-muted mb-2 d-block"></i>
+                <h5 class="fw-bold text-navy-900 mb-1" style="color: var(--navy-900);">No Candidates Found</h5>
+                <p class="text-muted small mb-0">Registered job seekers will appear here with access to their resumes.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

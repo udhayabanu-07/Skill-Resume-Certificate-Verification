@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Resumes & Credentials{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-wrapper">
+    <div class="hero-mesh"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-pill">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <span>Human-Supervised Credential Verification</span>
+                </div>
+                <h1 class="hero-title">
+                    Authenticate Skills, Resumes & <span class="gradient-text">Certificates</span> with Total Confidence.
+                </h1>
+                <p class="hero-lead">
+                    A secure, production-grade verification engine. Eliminates credential fraud with strict file integrity checks, modular architecture, and mandatory authorized admin audits.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('auth.dashboard_redirect') }}" class="btn btn-teal btn-lg">
+                            <i class="bi bi-arrow-right-circle-fill"></i> Go to My Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-teal btn-lg">
+                            <i class="bi bi-person-plus-fill"></i> Create Free Seeker Profile
+                        </a>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Reviewer Sign In
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Trust indicators -->
+                <div class="d-flex align-items-center gap-4 mt-5 text-white-50 small">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-teal" style="color: var(--teal-300);"></i>
+                        <span>Zero Auto-Approvals</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-lock-fill text-teal" style="color: var(--teal-300);"></i>
+                        <span>CSRF & MIME Protected</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-database-fill-gear text-teal" style="color: var(--teal-300);"></i>
+                        <span>MySQL + PyMySQL Engine</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Glass Preview Card -->
+            <div class="col-lg-5">
+                <div class="hero-glass-card">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="p-2 rounded-circle bg-success bg-opacity-25 text-success">
+                                <i class="bi bi-check2-circle fs-5"></i>
+                            </span>
+                            <div>
+                                <h6 class="mb-0 text-white fw-bold">Live Verification Flow</h6>
+                                <small class="text-white-50">Audit Process Overview</small>
+                            </div>
+                        </div>
+                        <span class="badge bg-teal" style="background: var(--teal-500);">Active</span>
+                    </div>
+
+                    <!-- Pipeline Steps inside Glass Card -->
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 d-flex align-items-center gap-3">
+                            <div class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-upload"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong class="d-block text-white small">1. Seeker Uploads Certificate</strong>
+                                <small class="text-white-50">MIME and safe filename generated</small>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-light">MIME OK</span>
+                        </div>
+
+                        <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 d-flex align-items-center gap-3">
+                            <div class="stat-icon warning" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong class="d-block text-white small">2. Enters Admin Review Queue</strong>
+                                <small class="text-white-50">Awaiting human reviewer audit</small>
+                            </div>
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        </div>
+
+                        <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 d-flex align-items-center gap-3">
+                            <div class="stat-icon teal" style="width: 40px; height: 40px; font-size: 1.1rem;">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <strong class="d-block text-white small">3. Authorized Admin Approves</strong>
+                                <small class="text-white-50">Verification record & audit log stored</small>
+                            </div>
+                            <span class="badge bg-success">Verified</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Stats Counter -->
+<section class="py-5 bg-white border-bottom">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon teal">
+                        <i class="bi bi-patch-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ stats.verified_certificates }}</div>
+                        <div class="stat-label">Verified Credentials</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon navy">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ stats.total_profiles }}</div>
+                        <div class="stat-label">Job Seeker Profiles</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon teal">
+                        <i class="bi bi-lightning-charge-fill"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ stats.total_skills }}</div>
+                        <div class="stat-label">Claimed & Tested Skills</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-5 my-3">
+    <div class="container">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="badge px-3 py-2 text-uppercase fw-bold mb-2" style="background: var(--teal-50); color: var(--teal-600); border: 1px solid rgba(0, 168, 150, 0.2);">
+                Enterprise-Ready Architecture
+            </span>
+            <h2 class="fw-bold text-navy-900" style="color: var(--navy-900);">Built For Integrity, Security and Reliability</h2>
+            <p class="text-muted">
+                Engineered following clean architectural patterns with Flask Application Factory, Blueprint modularity, and strict validation layers.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon teal mb-3">
+                        <i class="bi bi-shield-shaded"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">Role-Based Access Control</h5>
+                    <p class="text-secondary small mb-0">
+                        Strict separation of roles between Job Seekers and Administrators. Administrative queues and verification tools are rigorously guarded with custom decorators.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon navy mb-3">
+                        <i class="bi bi-file-earmark-lock2-fill"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">Strict File & MIME Security</h5>
+                    <p class="text-secondary small mb-0">
+                        Files are sanitized via cryptographic safe filenames, extension whitelisting, MIME inspection, and strict 16MB upload caps to protect against malicious uploads.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon warning mb-3">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">Human Review Guardrail</h5>
+                    <p class="text-secondary small mb-0">
+                        Zero automated or fabricated certificate approvals. Every certificate requires manual inspection, credential ID validation, and an auditable decision log.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon teal mb-3">
+                        <i class="bi bi-database-fill-lock"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">MySQL via PyMySQL</h5>
+                    <p class="text-secondary small mb-0">
+                        Production database powered by MySQL with PyMySQL driver and SQLAlchemy connection pooling, featuring seamless zero-config SQLite local testing fallback.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon navy mb-3">
+                        <i class="bi bi-lock-fill"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">CSRF & Session Protection</h5>
+                    <p class="text-secondary small mb-0">
+                        Built-in session-tied CSRF token verification across all mutating HTTP requests (POST, PUT, DELETE), Werkzeug salted password hashing, and HttpOnly cookies.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="col-md-4">
+                <div class="card-custom p-4 h-100">
+                    <div class="stat-icon teal mb-3">
+                        <i class="bi bi-diagram-3-fill"></i>
+                    </div>
+                    <h5 class="fw-bold text-navy-900 mb-2">Modular Blueprint Design</h5>
+                    <p class="text-secondary small mb-0">
+                        Decoupled architecture split cleanly into authentication, seeker profile management, administrative control, certificate verification, and reports.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to action section -->
+<section class="py-5 bg-white border-top">
+    <div class="container text-center py-4">
+        <h3 class="fw-bold mb-3" style="color: var(--navy-900);">Ready to Build Your Verified Career Profile?</h3>
+        <p class="text-muted mx-auto mb-4" style="max-width: 600px;">
+            Join the platform today to upload your resume, list your education and skills, and get your certifications verified by authorized reviewers.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-teal btn-lg">
+                <i class="bi bi-person-plus-fill"></i> Register Now
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-teal btn-lg">
+                <i class="bi bi-box-arrow-in-right"></i> Sign In
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

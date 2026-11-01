@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found (404){% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="card-custom p-5 mx-auto" style="max-width: 540px;">
+        <span class="badge bg-light text-muted p-3 rounded-circle mb-3 d-inline-block border">
+            <i class="bi bi-compass display-4" style="color: var(--teal-500);"></i>
+        </span>
+        <h2 class="fw-bold text-navy-900 mb-2" style="color: var(--navy-900);">404 - Resource Not Found</h2>
+        <p class="text-secondary mb-4">
+            The page or credential record you are seeking does not exist or may have been moved.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('main.index') }}" class="btn btn-teal">
+                <i class="bi bi-house-door"></i> Back to Safety
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

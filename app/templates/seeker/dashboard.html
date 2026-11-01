@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+
+{% block title %}Seeker Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header banner -->
+    <div class="card-custom p-4 mb-4 bg-white">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon teal" style="width: 58px; height: 58px; font-size: 1.8rem;">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold mb-1" style="color: var(--navy-900);">
+                        {{ profile.full_name if profile and profile.full_name else current_user.username }}'s Workspace
+                    </h3>
+                    <p class="text-muted small mb-0">
+                        {{ profile.headline if profile and profile.headline else 'Job Seeker Portal • Resume & Credential Management' }}
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('seeker.view_profile') }}" class="btn btn-outline-navy">
+                    <i class="bi bi-person-circle me-1"></i> My Profile
+                </a>
+                <a href="{{ url_for('seeker.resume_builder') }}" class="btn btn-teal">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Resume
+                </a>
+                <a href="{{ url_for('seeker.resume_preview') }}" class="btn btn-outline-teal">
+                    <i class="bi bi-eye-fill me-1"></i> Preview Resume
+                </a>
+                <a href="{{ url_for('seeker.resume_download_pdf') }}" class="btn btn-navy">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF
+                </a>
+            </div>
+        </div>
+        <div class="mt-3 pt-3 border-top">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <small class="fw-bold text-dark">Profile Completion Progress</small>
+                <small class="fw-bold text-teal">{{ profile.profile_completion_percentage }}%</small>
+            </div>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-teal" role="progressbar" style="width: {{ profile.profile_completion_percentage }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-file-earmark-person-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ stats.resume_count }}</div>
+                    <div class="stat-label">Uploaded Resumes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon teal">
+                    <i class="bi bi-patch-check-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ stats.verified_certificates }}</div>
+                    <div class="stat-label">Verified Certs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ stats.pending_certificates }}</div>
+                    <div class="stat-label">Pending Certs</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon navy">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value">{{ stats.skill_count }}</div>
+                    <div class="stat-label">Listed Skills</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- SECTION 1: RESUME MANAGEMENT                                    -->
+    <!-- =============================================================== -->
+    <div class="row g-4 mb-5">
+        <!-- Interactive Platform Resume Overview Card -->
+        <div class="col-lg-7">
+            <div class="card-custom p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon teal" style="width: 42px; height: 42px; font-size: 1.25rem;">
+                            <i class="bi bi-file-earmark-richtext-fill"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Digital Resume Profile</h5>
+                            <small class="text-muted">Interactive CV with verified credential endorsements</small>
+                        </div>
+                    </div>
+                    <span class="badge bg-teal" style="background: var(--teal-500);">Live CV</span>
+                </div>
+
+                <!-- Resume Sections Checklist -->
+                <div class="row g-2 mb-4">
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Objective</small>
+                            <strong class="{{ 'text-success' if profile.effective_objective else 'text-muted' }}">
+                                <i class="bi {{ 'bi-check-circle-fill' if profile.effective_objective else 'bi-dash-circle' }}"></i>
+                                {{ 'Added' if profile.effective_objective else 'Empty' }}
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Education</small>
+                            <strong class="{{ 'text-success' if stats.education_count > 0 else 'text-muted' }}">
+                                {{ stats.education_count }} Recorded
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Skills</small>
+                            <strong class="{{ 'text-success' if stats.skill_count > 0 else 'text-muted' }}">
+                                {{ stats.skill_count }} Added
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Experience</small>
+                            <strong class="{{ 'text-success' if stats.experience_count > 0 else 'text-muted' }}">
+                                {{ stats.experience_count }} Roles
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Projects</small>
+                            <strong class="{{ 'text-success' if stats.project_count > 0 else 'text-muted' }}">
+                                {{ stats.project_count }} Built
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <div class="p-2 border rounded-2 bg-light text-center">
+                            <small class="text-muted d-block">Verified Certs</small>
+                            <strong class="{{ 'text-success' if stats.verified_certificates > 0 else 'text-muted' }}">
+                                {{ stats.verified_certificates }} Verified
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-light border mb-4">
+                    <p class="small text-secondary mb-2">
+                        <strong>Career Objective / Summary:</strong>
+                    </p>
+                    <p class="small text-muted mb-0 fst-italic">
+                        {{ profile.effective_objective if profile.effective_objective else 'No career objective specified yet. Click "Edit Resume" to provide a professional summary.' }}
+                    </p>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-auto">
+                    <a href="{{ url_for('seeker.resume_builder') }}" class="btn btn-teal">
+                        <i class="bi bi-pencil-square me-1"></i> Edit Resume Sections
+                    </a>
+                    <a href="{{ url_for('seeker.resume_preview') }}" class="btn btn-outline-teal">
+                        <i class="bi bi-eye-fill me-1"></i> Full Web Preview
+                    </a>
+                    <a href="{{ url_for('seeker.resume_download_pdf') }}" class="btn btn-navy">
+                        <i class="bi bi-download me-1"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Existing Resume (PDF / DOCX) Card -->
+        <div class="col-lg-5">
+            <div class="card-custom p-4 bg-white h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="stat-icon navy" style="width: 42px; height: 42px; font-size: 1.25rem;">
+                        <i class="bi bi-file-earmark-arrow-up-fill"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Upload Existing Resume</h5>
+                        <small class="text-muted">Attach pre-formatted PDF or Word documents</small>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('seeker.upload_existing_resume') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="resume_file" class="form-label form-label-custom">Select Resume Document <span class="text-danger">*</span></label>
+                        <input 
+                            type="file" 
+                            class="form-control form-control-custom" 
+                            id="resume_file" 
+                            name="resume_file" 
+                            accept=".pdf,.docx,.doc"
+                            data-max-size="16777216"
+                            required
+                        >
+                        <div class="form-text small">
+                            <i class="bi bi-shield-check text-teal"></i> Formats: <strong>PDF, DOCX, DOC</strong> (Max 16 MB).
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-teal w-100 py-2">
+                        <i class="bi bi-cloud-arrow-up me-1"></i> Upload Document
+                    </button>
+                </form>
+
+                <hr class="my-4">
+
+                <!-- Uploaded Files Mini-List -->
+                <h6 class="fw-bold small text-navy-900 mb-2">Uploaded Resume Files ({{ resumes|length }})</h6>
+                {% if resumes %}
+                    <div class="d-flex flex-column gap-2">
+                        {% for res in resumes %}
+                            <div class="p-2 border rounded-2 bg-light d-flex align-items-center justify-content-between gap-2">
+                                <div class="text-truncate">
+                                    <strong class="d-block small text-truncate" title="{{ res.original_filename }}">
+                                        {{ res.original_filename }}
+                                    </strong>
+                                    <small class="text-muted">
+                                        {{ (res.file_size / 1024)|round(1) }} KB • {{ res.uploaded_at.strftime('%b %d, %Y') }}
+                                        {% if res.is_primary %}
+                                            <span class="badge bg-success" style="font-size: 0.65rem;">Primary</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="d-flex align-items-center gap-1 flex-shrink-0">
+                                    <a href="{{ url_for('seeker.view_uploaded_resume', resume_id=res.id) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-0 px-2" title="View Document">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if not res.is_primary %}
+                                        <form method="POST" action="{{ url_for('seeker.set_primary_resume', resume_id=res.id) }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-teal py-0 px-2" title="Set as Primary">
+                                                <i class="bi bi-star"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('seeker.delete_uploaded_resume', resume_id=res.id) }}" class="d-inline" onsubmit="return confirm('Delete this resume file?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted small fst-italic mb-0">No existing resume documents uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- SECTION 2: CERTIFICATES & CREDENTIALS                           -->
+    <!-- =============================================================== -->
+    <div class="row g-4">
+        <!-- Certificate Upload Section -->
+        <div class="col-lg-5">
+            <div class="card-custom p-4 bg-white h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="stat-icon teal" style="width: 42px; height: 42px; font-size: 1.25rem;">
+                        <i class="bi bi-award-fill"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">Upload Certificate</h5>
+                        <small class="text-muted">Submit credentials for human admin verification</small>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('seeker.upload_certificate') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Certificate Title / Name -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label form-label-custom">Certificate Name / Title <span class="text-danger">*</span></label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-custom" 
+                            id="title" 
+                            name="title" 
+                            placeholder="e.g. AWS Certified Solutions Architect" 
+                            required
+                        >
+                    </div>
+
+                    <!-- Issuing Organization -->
+                    <div class="mb-3">
+                        <label for="issuing_organization" class="form-label form-label-custom">Issuing Organization <span class="text-danger">*</span></label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-custom" 
+                            id="issuing_organization" 
+                            name="issuing_organization" 
+                            placeholder="e.g. Amazon Web Services, Cisco, Google" 
+                            required
+                        >
+                    </div>
+
+                    <!-- Issue Date and Expiration Date -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="issue_date" class="form-label form-label-custom">Issue Date</label>
+                            <input 
+                                type="date" 
+                                class="form-control form-control-custom" 
+                                id="issue_date" 
+                                name="issue_date"
+                            >
+                        </div>
+                        <div class="col-6">
+                            <label for="expiration_date" class="form-label form-label-custom">Expiration Date</label>
+                            <input 
+                                type="date" 
+                                class="form-control form-control-custom" 
+                                id="expiration_date" 
+                                name="expiration_date"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Credential ID (Optional) -->
+                    <div class="mb-3">
+                        <label for="credential_id" class="form-label form-label-custom">Credential ID <span class="text-muted small fw-normal">(Optional)</span></label>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-custom" 
+                            id="credential_id" 
+                            name="credential_id" 
+                            placeholder="e.g. CERT-987654321"
+                        >
+                    </div>
+
+                    <!-- File Upload Input -->
+                    <div class="mb-4">
+                        <label for="certificate_file" class="form-label form-label-custom">Certificate Document <span class="text-danger">*</span></label>
+                        <input 
+                            type="file" 
+                            class="form-control form-control-custom" 
+                            id="certificate_file" 
+                            name="certificate_file" 
+                            accept=".pdf,.png,.jpg,.jpeg" 
+                            data-max-size="16777216"
+                            required
+                        >
+                        <div class="form-text small">
+                            <i class="bi bi-info-circle me-1"></i> Accepted formats: <strong>PDF, JPG, PNG</strong> (Max 16 MB).
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-teal w-100 py-2">
+                        <i class="bi bi-shield-check me-1"></i> Submit for Verification
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Uploaded Certificates List -->
+        <div class="col-lg-7">
+            <div class="card-custom p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="stat-icon navy" style="width: 42px; height: 42px; font-size: 1.25rem;">
+                            <i class="bi bi-patch-check-fill"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-navy-900" style="color: var(--navy-900);">My Certificates</h5>
+                            <small class="text-muted">Track human verification status</small>
+                        </div>
+                    </div>
+                    <span class="badge bg-light text-dark border px-3 py-2">
+                        Total: {{ certificates|length }}
+                    </span>
+                </div>
+
+                {% if certificates %}
+                    <div class="table-responsive">
+                        <table class="table align-middle table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Certificate</th>
+                                    <th>Issuing Body</th>
+                                    <th>Status</th>
+                                    <th>Dates</th>
+                                    <th class="text-end">Document</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cert in certificates %}
+                                    <tr>
+                                        <td>
+                                            <strong class="d-block text-navy-900">{{ cert.title }}</strong>
+                                            {% if cert.credential_id %}
+                                                <small class="text-muted">ID: <code>{{ cert.credential_id }}</code></small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary small">{{ cert.issuing_organization }}</span>
+                                        </td>
+                                        <td>
+                                            {% if cert.status == 'verified' %}
+                                                <span class="status-badge verified">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Verified
+                                                </span>
+                                            {% elif cert.status == 'rejected' %}
+                                                <span class="status-badge rejected">
+                                                    <i class="bi bi-x-circle-fill me-1"></i> Rejected
+                                                </span>
+                                            {% else %}
+                                                <span class="status-badge pending">
+                                                    <i class="bi bi-clock-history me-1"></i> Pending
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="small">
+                                            {% if cert.issue_date %}
+                                                <div class="text-muted">Issued: {{ cert.issue_date.strftime('%b %d, %Y') }}</div>
+                                            {% endif %}
+                                            <div class="text-muted">Uploaded: {{ cert.uploaded_at.strftime('%b %d, %Y') }}</div>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end gap-1">
+                                                <a 
+                                                    href="{{ url_for('seeker.view_certificate', cert_id=cert.id) }}" 
+                                                    target="_blank" 
+                                                    class="btn btn-sm btn-outline-teal"
+                                                    title="View or download uploaded file"
+                                                >
+                                                    <i class="bi bi-file-earmark-arrow-down"></i>
+                                                </a>
+                                                <a 
+                                                    href="{{ url_for('seeker.edit_certificate', cert_id=cert.id) }}" 
+                                                    class="btn btn-sm btn-outline-secondary"
+                                                    title="Edit Details"
+                                                >
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form method="POST" action="{{ url_for('seeker.delete_certificate', cert_id=cert.id) }}" class="d-inline" onsubmit="return confirm('Delete certificate {{ cert.title }}?');">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-5 text-center rounded-3 bg-light my-auto">
+                        <i class="bi bi-award display-4 text-muted mb-3 d-block"></i>
+                        <h6 class="fw-bold text-navy-900 mb-1" style="color: var(--navy-900);">No Certificates Uploaded Yet</h6>
+                        <p class="text-muted small mb-0">Use the form on the left to upload your certifications. Once uploaded, an administrator will review and verify them.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
